@@ -5,6 +5,7 @@
 #define MAX 10000 
 
 // Struct for thread arguments
+// It consists of left and right indices and the array pointer
 typedef struct {
     int left;
     int right;
@@ -47,9 +48,36 @@ void merge(int arr[], int left, int mid, int right) {
 }
 
 void* threaded_merge_sort(void* arg) {
+    // Arguments type casting
+    ThreadArgs* args = (ThreadArgs*)arg;
 
-    // Implement the full function to be using the merge function
-    // Then call it from main function
+    // Base case
+    if (args->left >= args->right) {
+        return NULL;
+    }
+
+    int mid = args->left + (args->right - args->left) / 2;
+
+    // Sort left half, right half, then merge
+    // First, create thread arguments for left and right halves
+    ThreadArgs leftArgs = {args->left, mid, args->arr};
+    ThreadArgs rightArgs = {mid + 1, args->right, args->arr};
+
+    // Create threads for left and right halves
+    pthread_t leftThread, rightThread;
+
+    // Recursively sort both halves in separate threads
+    pthread_create(&leftThread, NULL, threaded_merge_sort, &leftArgs);
+    pthread_create(&rightThread, NULL, threaded_merge_sort, &rightArgs);
+
+    // Wait for both threads to finish
+    pthread_join(leftThread, NULL);
+    pthread_join(rightThread, NULL);
+
+    // Merge the sorted halves
+    merge(args->arr, args->left, mid, args->right);
+
+    return NULL;
 }
 
 int main() {
@@ -67,7 +95,8 @@ int main() {
     }
     fclose(file);
 
-    // Make the required changes inorder to be able to call the Thread function
+    ThreadArgs args = {0, n - 1, arr};
+    threaded_merge_sort(&args);
 
     printf("Sorted array:\n");
     for (int i = 0; i < n; i++) {
