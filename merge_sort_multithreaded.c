@@ -81,7 +81,7 @@ void* threaded_merge_sort(void* arg) {
 }
 
 int main() {
-    FILE* file = fopen("input", "r");
+    FILE* file = fopen("sample_input.txt", "r");
     if (!file) {
         printf("Error opening file.\n");
         return 1;
