@@ -1,0 +1,4 @@
+merge_sort
+
+*.txt
+!sample_input.txt
